@@ -1,0 +1,43 @@
+---
+title: "Activity Week 5 Visualization"
+author: "Kevin M Rabidou"
+date: "2023-06-21"
+output:
+  word_document: default
+  html_document: default
+---
+
+
+```{r setup, include = FALSE}
+library(tidyverse)
+
+```
+```{r url, include = FALSE, message = FALSE}
+# Section 2
+# Name the link then create a new set after uploading the file
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/bad-drivers/bad-drivers.csv"
+DrivingData <- read_csv(url)
+# As the dataset was set as a csv file from GitHub, I found it best to use read.csv to read in the data. This reading function requires the "readr" package. This function also takes care of noticing the headers (row/column names) as well as the delimiter which in this case was a comma. Using read_csv() also allows for the column names to not be changed if there are spaces. 
+``` 
+
+```{r cleanData, include = FALSE}
+# Section 3
+# I am first going to rename some of the columns and use short hand as they have the majority of the same beginning phrase just a different category of driving. 
+# Short hand examples: 
+# Number of drivers involved in fatal collisions per billion miles = NoDiFC_perBillionMiles
+# Percentage Of Drivers Involved In Fatal Collisions Who Were Speeding = PoDiFC_Speeding ...(PoDIFC will be the same for the columns with the cuase cahnging after underscore)
+
+renamedDrivingData <- DrivingData %>% rename("NoDiFC_perBillionMiles" = "Number of drivers involved in fatal collisions per billion miles", "PoDiFC_Speeding" = "Percentage Of Drivers Involved In Fatal Collisions Who Were Speeding", "PoDiFC_AlcoholImpaired" = "Percentage Of Drivers Involved In Fatal Collisions Who Were Alcohol-Impaired" , "PoDiFC_NotDistracted" = "Percentage Of Drivers Involved In Fatal Collisions Who Were Not Distracted" , "PoDiFC_NoPreviousAccidents" = "Percentage Of Drivers Involved In Fatal Collisions Who Had Not Been Involved In Any Previous Accidents")
+```
+
+```{r visuals, message = FALSE}
+#This scatterplot looks to see any relationship between the driver per billion miles and the percent of the drivers in accidents who were not distracted. We want to look at if there is any correlation with the drivers in states driving distances and whether they get in accidents when they are focused on the road. 
+ggplot(renamedDrivingData,aes(x = NoDiFC_perBillionMiles , y = PoDiFC_NotDistracted) ) + geom_point() + labs(title = "Number of Accidents vs Not Distracted Driving", x = "Number of drivers involved in fatal collisions per billion miles", y = "% Of Drivers Involved In Fatal Collisions Who Were Not Distracted")
+
+#Another scatterplot to continue looking at the relationship of number of drivers in accidents but now looking at the percentage of drivers who have had no previous accidents. It can be important to see how the number of drivers in states can affect their percentages of carious causes of fatal accidents. 
+ggplot(renamedDrivingData,aes(x = NoDiFC_perBillionMiles , y = PoDiFC_NoPreviousAccidents) ) + geom_point() + labs(title = "Number of Accidents vs Speeding", x = "Number of drivers involved in fatal collisions per billion miles", y = "% Of Drivers Involved In Fatal Collisions Who Had Not Been Involved in Any Previous Accidents")
+
+#As speeding appears to be one of the easier variables to track it could be one of the more reliable ones to use so I looked at the distribution of drivers who were speeding at the time of a fatal accident. This helps get a better idea of the distribution fo how many of the dirvers were truly speeding at the time. 
+ggplot(data = renamedDrivingData, mapping = aes(x=PoDiFC_Speeding)) + geom_bar() + scale_x_continuous(limits = c(10,60), breaks = seq(10,60,2))
+
+```
